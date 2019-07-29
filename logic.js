@@ -1,42 +1,56 @@
-var config = {
-    apiKey: "AIzaSyAz-1DqJ_VtdTeyIBUJ_z8Cz3w3ImS-heA",
-    authDomain: "train-schedule-c2e01.firebaseapp.com",
-    databaseURL: "https://train-schedule-c  2e01.firebaseio.com",
-    projectId: "train-schedule-c2e01",
-    storageBucket: "",
-    messagingSenderId: "124878699224",
-    appId: "1:124878699224:web:6e4f02e3db5acbca"
-};
+$(document).ready(function () {
 
-firebase.initializeApp(config);
+    var config = {
+        apiKey: "AIzaSyAz-1DqJ_VtdTeyIBUJ_z8Cz3w3ImS-heA",
+        authDomain: "train-schedule-c2e01.firebaseapp.com",
+        databaseURL: "https://train-schedule-c  2e01.firebaseio.com",
+        projectId: "train-schedule-c2e01",
+        storageBucket: "",
+        messagingSenderId: "124878699224",
+        appId: "1:124878699224:web:6e4f02e3db5acbca"
+    };
 
-var database = firebase.database();
+    firebase.initializeApp(config);
 
-$('#submit').on('click', function (event) {
-    event.preventDefault();
+    var database = firebase.database();
 
-    database.ref().push({
-        trainName: $('#Train Name').val().trim(),
-        destination: $('#Destination').val().trim(),
-        firstTrainTime: $('#Next Arrival').val().trim(),
-        frequency: $('#Frequency (min)').val().trim(),
+    $('#submit').on('click', function (event) {
+        event.preventDefault();
+
+        database.ref().push({
+            trainName: $('#Train Name').val().trim(),
+            destination: $('#Destination').val().trim(),
+            firstTrainTime: $('#Next Arrival').val().trim(),
+            frequency: $('#Frequency (min)').val().trim(),
+        });
     });
-}); 
 
-database.ref().on("child_added", function(snapshot) {
-    var newPost = snapshot.val();
-    var body = $("#data-table");
-    var row = $("<tr>").appendTo(body);
-    var interval = snapshot.val().frequency;
-    var now = moment().toDate();
+    $('#submit').on('click', function (event) {
+        event.preventDefault();
 
-    console.log('today' + strDay);
+        database.ref().on("child_added", function (snapshot) {
+            var newstart = snapshot.val();
+            var body = $("#form-group");
+            var row = $("<tr>").appendTo(body);
+            var interval = snapshot.val().frequency;
+            var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
+            var now = moment();
+            var frequency = 0;
+            var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+            var remainder = diffTime % frequency;
+            var minutesAway = frequency - remainder;
+            var nextArrival = moment().add(tMinutesTillTrain, "minutes");
 
-    row.append(`<td>${newPost.trainName}</td>`);
-    row.append(`<td>${newPost.destination}</td>`);
-    row.append(`<td>${newPost.firstTrainTime}</td>`);
-    row.append(`<td>${newPost.frequency}</td>`);
 
-    console.log(newPost);
-    
-  });
+            console.log('today' + strDay);
+
+            row.append(`<td>${newstart.trainName}</td>`);
+            row.append(`<td>${newstart.destination}</td>`);
+            row.append(`<td>${newstart.firstTrainTime}</td>`);
+            row.append(`<td>${newstart.frequency}</td>`);
+
+            console.log(newPost);
+
+        });
+    });
+})
